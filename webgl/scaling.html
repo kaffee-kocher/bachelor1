@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGL - Scaling</title>
+  <meta charset="UTF-8">
+  <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+</head>
+<body>
+<canvas id="webgl" width="360" height="640"></canvas>
+<script type="text/javascript">
+  // Define canvas, WebGL context and set viewport
+  var canvas = document.getElementById("webgl");
+  var gl = canvas.getContext("experimental-webgl");
+  gl.viewportWidth = canvas.width;
+  gl.viewportHeight = canvas.height;
+
+  // Init and compile fragment shader
+  var fragment_shader = "precision mediump float;       void main(void) {       gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);        }";
+  var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragmentShader, fragment_shader);
+  gl.compileShader(fragmentShader);
+
+  // Init and compile vertex shader
+  var vertex_shader = "attribute vec3 aVertexPosition; uniform mat4 uMVMatrix; uniform mat4 uPMatrix; void main(void) { gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); }";
+  var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertexShader, vertex_shader);
+  gl.compileShader(vertexShader);
+
+  // Create shader program, add shader, link and use programm
+  var shaderProgram = gl.createProgram();
+  gl.attachShader(shaderProgram, vertexShader);
+  gl.attachShader(shaderProgram, fragmentShader);
+  gl.linkProgram(shaderProgram);
+  gl.useProgram(shaderProgram);
+
+  shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+  gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+
+  shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+  shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+
+  // Init matrices
+  var mvMatrix = mat4.create();
+  var pMatrix = mat4.create();
+
+  function setMatrixUniforms() {
+    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+  }
+
+  // Init and set position buffers + vertices
+  var squareVertexPositionBuffer = [];
+  var vertices = [];
+  for (var i = 0; i < 50; i++) {
+    vertices[i] = [
+      1, 1 - i * 2.2, 0,
+      -1, 1 - i * 2.2, 0,
+      1, -(1 + i * 2.2), 0,
+      -1, -(1 + i * 2.2), 0
+    ];
+    squareVertexPositionBuffer[i] = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer[i]);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices[i]), gl.STATIC_DRAW);
+    squareVertexPositionBuffer[i].itemSize = 3;
+    squareVertexPositionBuffer[i].numItems = 4;
+  }
+
+  function drawScene() {
+    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    mat4.perspective(160, gl.viewportWidth / gl.viewportHeight, 0.1, 100, pMatrix);
+    mat4.identity(mvMatrix);
+    mat4.translate(mvMatrix, [-21, 38, -7]);
+    setMatrixUniforms();
+
+    //mat4.translate(mvMatrix, [0.0, 0.0, 0.0]);
+    for (var i = 0; i < 50; i++) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer[i]);
+      gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer[i].itemSize, gl.FLOAT, false, 0, 0);
+      setMatrixUniforms();
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer[i].numItems);
+    }
+  }
+
+  function webGLStart() {
+    var requestAnimationFrame = window.requestAnimationFrame ||window.webkitRequestAnimationFrame;
+    gl.clearColor(1, 1, 1, 1);
+    gl.enable(gl.DEPTH_TEST);
+    var scale = 0;
+    drawScene();
+
+    var paint = function () {
+      console.log(window.performance.now(), window.performance.memory.usedJSHeapSize);
+      for (var i = 0; i < 50; i++) {
+        vertices[i] = [
+          -1+scale, 1 - i * 2.2, 0,
+          -1, 1 - i * 2.2, 0,
+          -1+scale, -(1 + i * 2.2) + (2 - scale), 0,
+          -1, -(1 + i * 2.2) + (2 - scale), 0
+        ];
+        gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer[i]);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices[i]), gl.STATIC_DRAW);
+      }
+
+      drawScene();
+      scale += .1;
+      if (scale > 1) {
+        scale = 0;
+      }
+      if (window.performance.now() < 301000) {
+        requestAnimationFrame(paint);
+      }
+      else {
+        for (var key in window.performance.timing) {
+          if (window.performance.timing.hasOwnProperty(key)) {
+            console.log(key, window.performance.timing[key]);
+          }
+        }
+      }
+    };
+
+    console.log('ready', window.performance.now());
+    requestAnimationFrame(paint);
+  }
+
+  window.addEventListener('load', webGLStart);
+</script>
+</body>
+</html>

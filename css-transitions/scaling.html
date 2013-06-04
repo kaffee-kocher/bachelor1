@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CSS - Translation</title>
+  <style>
+    div {
+      width: 10px;
+      height: 10px;
+      background-color: black;
+      margin-bottom: 2px;
+      -webkit-transition: -webkit-transform 6s linear;
+      -webkit-transform: scale(0, 0);
+    }
+
+    .animate {
+      -webkit-transform: scale(1, 1);
+    }
+  </style>
+</head>
+<body>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+
+<script>
+  window.addEventListener('load', function () {
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+
+    var logTime = function logTime() {
+      console.log(window.performance.now(), window.performance.memory.usedJSHeapSize);
+      if (window.performance.now() < 301000) {
+        requestAnimationFrame(logTime);
+      }
+      else {
+        for (var key in window.performance.timing) {
+          if (window.performance.timing.hasOwnProperty(key)) {
+            console.log(key, window.performance.timing[key]);
+          }
+        }
+      }
+    };
+
+    var allDIV = document.querySelectorAll('body > div');
+    var length = allDIV.length;
+    for (var i = 0; i < length; i++) {
+      allDIV.item(i).addEventListener('transitionend', function () {
+        if (this.getAttribute('class')) {
+          this.removeAttribute('class');
+        }
+        else {
+          this.setAttribute('class', 'animate');
+        }
+      });
+    }
+
+    console.log('ready', window.performance.now());
+    for (i = 0; i < length; i++) {
+      allDIV.item(i).setAttribute('class', 'animate');
+    }
+    requestAnimationFrame(logTime);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CSS - Scaling</title>
+  <style>
+    @-webkit-keyframes transform {
+      0% {
+        -webkit-transform: scale(0);
+      }
+      100% {
+        -webkit-transform: scale(1);
+      }
+    }
+
+    div {
+      width: 10px;
+      height: 10px;
+      background-color: black;
+      margin-bottom: 2px;
+      position: relative;
+      -webkit-animation: transform 6s linear 0 infinite normal;
+    }
+  </style>
+</head>
+<body>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+<div></div>
+
+<script>
+  window.addEventListener('load', function () {
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+
+    var logTime = function logTime() {
+      console.log(window.performance.now(), window.performance.memory.usedJSHeapSize);
+      if (window.performance.now() < 301000) {
+        requestAnimationFrame(logTime);
+      }
+      else {
+        for (var key in window.performance.timing) {
+          if (window.performance.timing.hasOwnProperty(key)) {
+            console.log(key, window.performance.timing[key]);
+          }
+        }
+      }
+    };
+
+    console.log('ready', window.performance.now());
+    requestAnimationFrame(logTime);
+  });
+</script>
+</body>
+</html>

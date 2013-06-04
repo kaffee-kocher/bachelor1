@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canvas - Translation</title>
+</head>
+<body>
+<canvas width="360" height="640" id="stage"></canvas>
+<script>
+  window.addEventListener('load', function () {
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame;
+    var canvas = document.getElementById("stage");
+    var context = canvas.getContext("2d");
+    var stage = {
+      width:  canvas.getAttribute("width"),
+      height: canvas.getAttribute("height")
+    };
+
+    var rect = {
+      count:  50,
+      width:  10,
+      height: 10,
+      color:  "black"
+    };
+    context.fillStyle = rect.color;
+
+    var position = {
+      x: 0,
+      y: 0
+    };
+    var i = 0;
+
+    var logTime = function logTime() {
+      console.log(window.performance.now(), window.performance.memory.usedJSHeapSize);
+      context.clearRect(0, 0, stage.width, stage.height);
+      position.y = 0;
+      if (position.x >= stage.width) {
+        position.x = 0;
+      }
+
+      for (i = 0; i < rect.count; i++) {
+        context.fillRect(position.x, position.y, rect.width, rect.height);
+        position.y += 12;
+      }
+
+      position.x += 1;
+      if (window.performance.now() < 301000) {
+         requestAnimationFrame(logTime);
+       }
+       else {
+         for (var key in window.performance.timing) {
+           if (window.performance.timing.hasOwnProperty(key)) {
+             console.log(key, window.performance.timing[key]);
+           }
+         }
+       }
+    };
+
+    console.log('ready', window.performance.now());
+    requestAnimationFrame(logTime);
+  });
+</script>
+</body>
+</html>
